@@ -407,6 +407,8 @@ interface ResolvedScanOptions {
   scoreOnly: boolean;
   offline: boolean;
   includePaths: string[];
+  customRulesOnly: boolean;
+  share: boolean;
 }
 
 const mergeScanOptions = (
@@ -419,6 +421,8 @@ const mergeScanOptions = (
   scoreOnly: inputOptions.scoreOnly ?? false,
   offline: inputOptions.offline ?? false,
   includePaths: inputOptions.includePaths ?? [],
+  customRulesOnly: userConfig?.customRulesOnly ?? false,
+  share: userConfig?.share ?? true,
 });
 
 const printProjectDetection = (
@@ -465,7 +469,8 @@ export const scan = async (
 ): Promise<ScanResult> => {
   const startTime = performance.now();
   const projectInfo = discoverProject(directory);
-  const userConfig = loadConfig(directory);
+  const userConfig =
+    inputOptions.configOverride !== undefined ? inputOptions.configOverride : loadConfig(directory);
   const options = mergeScanOptions(inputOptions, userConfig);
   const { includePaths } = options;
   const isDiffMode = includePaths.length > 0;
@@ -499,6 +504,7 @@ export const scan = async (
             projectInfo.hasReactCompiler,
             lintIncludePaths,
             resolvedNodeBinaryPath,
+            options.customRulesOnly,
           );
           lintSpinner?.succeed("Running lint checks.");
           return lintDiagnostics;
@@ -602,6 +608,7 @@ export const scan = async (
 
   const displayedSourceFileCount = isDiffMode ? includePaths.length : lintSourceFileCount;
 
+  const shouldShowShareLink = !options.offline && options.share;
   printSummary(
     diagnostics,
     elapsedMilliseconds,
@@ -609,7 +616,7 @@ export const scan = async (
     projectInfo.projectName,
     displayedSourceFileCount,
     noScoreMessage,
-    options.offline,
+    !shouldShowShareLink,
   );
 
   if (hasSkippedChecks) {

@@ -99,13 +99,6 @@ export interface ScanResult {
   skippedChecks: string[];
 }
 
-export interface EstimatedScoreResult {
-  currentScore: number;
-  currentLabel: string;
-  estimatedScore: number;
-  estimatedLabel: string;
-}
-
 export interface ScanOptions {
   lint?: boolean;
   deadCode?: boolean;
@@ -113,6 +106,7 @@ export interface ScanOptions {
   scoreOnly?: boolean;
   offline?: boolean;
   includePaths?: string[];
+  configOverride?: ReactDoctorConfig | null;
 }
 
 export interface DiffInfo {
@@ -174,4 +168,7 @@ export interface ReactDoctorConfig {
   verbose?: boolean;
   diff?: boolean | string;
   failOn?: FailOnLevel;
+  customRulesOnly?: boolean;
+  share?: boolean;
+  textComponents?: string[];
 }
