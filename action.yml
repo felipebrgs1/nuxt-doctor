@@ -23,6 +23,9 @@ inputs:
   fail-on:
     description: "Exit with error code on diagnostics: error, warning, none"
     default: "error"
+  offline:
+    description: "Skip sending diagnostics to the react.doctor API and calculate score locally"
+    default: "false"
   node-version:
     description: "Node.js version to use"
     default: "20"
@@ -39,19 +42,32 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
 
+    - if: ${{ inputs.diff != '' && github.event_name == 'pull_request' }}
+      shell: bash
+      run: |
+        git fetch origin "$DIFF_BASE" && git branch -f "$DIFF_BASE" FETCH_HEAD 2>/dev/null || true
+        git checkout "$HEAD_REF" 2>/dev/null || true
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        DIFF_BASE: ${{ inputs.diff }}
+        HEAD_REF: ${{ github.head_ref }}
+
     - shell: bash
       env:
+        NO_COLOR: "1"
         INPUT_DIRECTORY: ${{ inputs.directory }}
         INPUT_VERBOSE: ${{ inputs.verbose }}
         INPUT_PROJECT: ${{ inputs.project }}
         INPUT_DIFF: ${{ inputs.diff }}
         INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
         INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        INPUT_OFFLINE: ${{ inputs.offline }}
       run: |
         FLAGS="--fail-on $INPUT_FAIL_ON"
         if [ "$INPUT_VERBOSE" = "true" ]; then FLAGS="$FLAGS --verbose"; fi
         if [ -n "$INPUT_PROJECT" ]; then FLAGS="$FLAGS --project $INPUT_PROJECT"; fi
         if [ -n "$INPUT_DIFF" ]; then FLAGS="$FLAGS --diff $INPUT_DIFF"; fi
+        if [ "$INPUT_OFFLINE" = "true" ]; then FLAGS="$FLAGS --offline"; fi
 
         if [ -n "$INPUT_GITHUB_TOKEN" ]; then
           npx -y react-doctor@latest "$INPUT_DIRECTORY" $FLAGS | tee /tmp/react-doctor-output.txt
@@ -64,8 +80,11 @@ runs:
       shell: bash
       env:
         INPUT_DIRECTORY: ${{ inputs.directory }}
+        INPUT_OFFLINE: ${{ inputs.offline }}
       run: |
-        SCORE=$(npx -y react-doctor@latest "$INPUT_DIRECTORY" --score 2>/dev/null | tail -1 | tr -d '[:space:]')
+        OFFLINE_FLAG=""
+        if [ "$INPUT_OFFLINE" = "true" ]; then OFFLINE_FLAG="--offline"; fi
+        SCORE=$(npx -y react-doctor@latest "$INPUT_DIRECTORY" --score $OFFLINE_FLAG 2>/dev/null | tail -1 | tr -d '[:space:]')
         if [[ -n "$SCORE" && "$SCORE" =~ ^[0-9]+$ ]]; then
           echo "score=$SCORE" >> "$GITHUB_OUTPUT"
         fi
@@ -90,14 +109,15 @@ runs:
           });
           const prev = comments.find((c) => c.body?.startsWith(marker));
           if (prev) {
-            await github.rest.issues.deleteComment({
+            await github.rest.issues.updateComment({
               ...context.repo,
               comment_id: prev.id,
+              body,
+            });
+          } else {
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body,
             });
           }
-
-          await github.rest.issues.createComment({
-            ...context.repo,
-            issue_number: context.issue.number,
-            body,
-          });

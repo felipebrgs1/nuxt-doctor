@@ -301,12 +301,13 @@ const markAnimationCompleted = () => {
 };
 
 const Terminal = () => {
-  const [state, setState] = useState<AnimationState>(
-    didAnimationComplete() ? COMPLETED_STATE : INITIAL_STATE,
-  );
+  const [state, setState] = useState<AnimationState>(INITIAL_STATE);
 
   useEffect(() => {
-    if (didAnimationComplete()) return;
+    if (didAnimationComplete()) {
+      setState(COMPLETED_STATE);
+      return;
+    }
 
     let cancelled = false;
 
