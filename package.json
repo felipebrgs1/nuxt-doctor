@@ -1,6 +1,9 @@
 {
   "name": "nuxt-doctor",
   "private": true,
+  "bin": {
+    "nuxt-doctor": "./packages/nuxt-doctor/dist/cli.js"
+  },
   "homepage": "https://github.com/felipeb/nuxt-doctor#readme",
   "bugs": {
     "url": "https://github.com/felipeb/nuxt-doctor/issues"
