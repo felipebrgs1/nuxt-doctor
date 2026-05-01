@@ -1,19 +1,19 @@
 {
-  "name": "react-doctor",
+  "name": "nuxt-doctor",
   "private": true,
-  "homepage": "https://github.com/aidenybai/react-doctor#readme",
+  "homepage": "https://github.com/felipeb/nuxt-doctor#readme",
   "bugs": {
-    "url": "https://github.com/aidenybai/react-doctor/issues"
+    "url": "https://github.com/felipeb/nuxt-doctor/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aidenybai/react-doctor.git"
+    "url": "https://github.com/felipeb/nuxt-doctor.git"
   },
   "type": "module",
   "scripts": {
-    "dev": "turbo run dev --filter=react-doctor",
-    "build": "turbo run build --filter=react-doctor",
-    "test": "turbo run test --filter=react-doctor",
+    "dev": "turbo run dev --filter=react-doctor --filter=nuxt-doctor",
+    "build": "turbo run build --filter=react-doctor --filter=nuxt-doctor",
+    "test": "turbo run test --filter=react-doctor --filter=nuxt-doctor",
     "typecheck": "turbo run typecheck",
     "lint": "vp lint",
     "lint:fix": "vp lint --fix",

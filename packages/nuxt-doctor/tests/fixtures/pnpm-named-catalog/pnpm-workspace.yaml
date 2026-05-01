@@ -1,0 +1,6 @@
+packages:
+  - "packages/*"
+
+catalogs:
+  vue_v3_5_current:
+    vue: ^3.5.0

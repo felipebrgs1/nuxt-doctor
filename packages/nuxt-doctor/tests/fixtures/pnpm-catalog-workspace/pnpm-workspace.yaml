@@ -1,0 +1,9 @@
+packages:
+  - "packages/*"
+
+catalog:
+  vue: ^3.5.0
+
+catalogs:
+  vue_v3_4:
+    vue: ^3.4.0

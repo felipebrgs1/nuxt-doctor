@@ -1,0 +1,7 @@
+{
+  "name": "test-component-library",
+  "private": true,
+  "peerDependencies": {
+    "vue": "^3.4.0 || ^3.5.0"
+  }
+}

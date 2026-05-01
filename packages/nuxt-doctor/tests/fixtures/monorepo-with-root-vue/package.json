@@ -1,0 +1,10 @@
+{
+  "name": "monorepo-root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "vue": "^3.5.0"
+  }
+}

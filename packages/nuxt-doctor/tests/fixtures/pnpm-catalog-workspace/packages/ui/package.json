@@ -1,0 +1,7 @@
+{
+  "name": "ui",
+  "private": true,
+  "dependencies": {
+    "vue": "catalog:"
+  }
+}

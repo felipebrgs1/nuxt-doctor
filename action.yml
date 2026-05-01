@@ -1,5 +1,5 @@
-name: "React Doctor"
-description: "Scan React codebases for security, performance, and correctness issues"
+name: "Nuxt Doctor"
+description: "Scan Nuxt/Vue codebases for security, performance, and correctness issues"
 branding:
   icon: "activity"
   color: "blue"
@@ -24,7 +24,7 @@ inputs:
     description: "Exit with error code on diagnostics: error, warning, none"
     default: "error"
   offline:
-    description: "Skip sending diagnostics to the react.doctor API and calculate score locally"
+    description: "Skip sending diagnostics to the nuxt.doctor API and calculate score locally"
     default: "false"
   node-version:
     description: "Node.js version to use"
@@ -70,9 +70,9 @@ runs:
         if [ "$INPUT_OFFLINE" = "true" ]; then FLAGS="$FLAGS --offline"; fi
 
         if [ -n "$INPUT_GITHUB_TOKEN" ]; then
-          npx -y react-doctor@latest "$INPUT_DIRECTORY" $FLAGS | tee /tmp/react-doctor-output.txt
+          npx -y nuxt-doctor@latest "$INPUT_DIRECTORY" $FLAGS | tee /tmp/nuxt-doctor-output.txt
         else
-          npx -y react-doctor@latest "$INPUT_DIRECTORY" $FLAGS
+          npx -y nuxt-doctor@latest "$INPUT_DIRECTORY" $FLAGS
         fi
 
     - id: score
@@ -84,7 +84,7 @@ runs:
       run: |
         OFFLINE_FLAG=""
         if [ "$INPUT_OFFLINE" = "true" ]; then OFFLINE_FLAG="--offline"; fi
-        SCORE=$(npx -y react-doctor@latest "$INPUT_DIRECTORY" --score $OFFLINE_FLAG 2>/dev/null | tail -1 | tr -d '[:space:]')
+        SCORE=$(npx -y nuxt-doctor@latest "$INPUT_DIRECTORY" --score $OFFLINE_FLAG 2>/dev/null | tail -1 | tr -d '[:space:]')
         if [[ -n "$SCORE" && "$SCORE" =~ ^[0-9]+$ ]]; then
           echo "score=$SCORE" >> "$GITHUB_OUTPUT"
         fi
@@ -95,13 +95,13 @@ runs:
         github-token: ${{ inputs.github-token }}
         script: |
           const fs = require("fs");
-          const path = "/tmp/react-doctor-output.txt";
+          const path = "/tmp/nuxt-doctor-output.txt";
           if (!fs.existsSync(path)) return;
           const output = fs.readFileSync(path, "utf8").trim();
           if (!output) return;
 
-          const marker = "<!-- react-doctor -->";
-          const body = `${marker}\n## 🩺 React Doctor\n\n\`\`\`\n${output}\n\`\`\``;
+          const marker = "<!-- nuxt-doctor -->";
+          const body = `${marker}\n## 🩺 Nuxt Doctor\n\n\`\`\`\n${output}\n\`\`\``;
 
           const { data: comments } = await github.rest.issues.listComments({
             ...context.repo,

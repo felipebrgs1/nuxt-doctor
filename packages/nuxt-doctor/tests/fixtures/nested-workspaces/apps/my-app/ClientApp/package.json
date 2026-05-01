@@ -1,0 +1,6 @@
+{
+  "name": "my-app-client",
+  "dependencies": {
+    "vue": "^3.5.0"
+  }
+}
