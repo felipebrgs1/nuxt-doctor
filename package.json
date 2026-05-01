@@ -1,6 +1,5 @@
 {
   "name": "nuxt-doctor",
-  "private": true,
   "bin": {
     "nuxt-doctor": "./packages/nuxt-doctor/dist/cli.js"
   },
